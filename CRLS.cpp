@@ -28,35 +28,45 @@ std::vector<sf::Int16> m_waveform;
 //A 0-populated vector ( sound is off )
 std::vector<sf::Int16> m_silence;
 
+//This represents how many samples have been generated and must be streamed at each "onGetData"
+//It is basically the wavelength multiplied by something for convenience
+int generated = 2205;
+
+//These control the streaming and note generation
+int currentKey = sf::Keyboard::Q;
+int lastKey = currentKey;
+bool keyDown = false;
+
+//This generates the samples, according to the frequency
 void customMake( float freq ){
     m_waveform.clear(); // We clear the vector
 
+    //Compute and store the wavelength multiplied by something...
+    generated = 44100.f * 10.f / freq;
+
+    //TODO : the wavelength above might cause issues on higher notes
+    //FIX Solution : ( use a greater multiplier for those notes )
+    //Find some exponential function or something like that
+
     //Then add the elements
-    for ( int i = 0; i < 11026; i++ ){
+    for ( int i = 0; i < generated*5+1; i++ ){ // Generated more than necessary to be sure
 
         //This is used to generate a sine wave of specific frequency
-        //m_waveform.push_back( sf::Int16( sin ( i*M_PI*freq/44100.f )* 16000.f ) );
+        m_waveform.push_back( sf::Int16( sin ( i*M_PI*freq/44100.f )* 16000.f ) );
 
         //This is used to generate a square wave of specific frequency
-        m_waveform.push_back( ( ( i/ ( int(44100.f/freq) ) ) %2) * 8000.f - 4000.f );
+        //m_waveform.push_back( ( ( i/ ( int(44100.f/freq) ) ) %2) * 8000.f - 4000.f );
 
         //This is used to generate random noise ( no frequency )
         //m_waveform.push_back( rand()%16000-8000 );
     }
 }
-std::size_t m_currentSample;
-
-//represents whether or not the synth is actually playing something
-bool silenced = false;
 
 // custom audio stream that plays a loaded buffer
 class SynthStream : public sf::SoundStream
 {
 public:
     void load(){
-        //start at the first sample in the m_waveform / m_silence vector
-        m_currentSample = 0;
-
         //Initialize an audio output stream ( 1 = mono, 44100 = samples/second )
         initialize( 1, 44100 );
     }
@@ -65,52 +75,33 @@ private:
 
     virtual bool onGetData(Chunk& data){
 
-        //At 44100 samples / second this should be equivalent to 50 ms of sound
-        const int samplesToStream = 2205;
-
         // set the pointer to the next audio samples to be played
-        if ( !silenced )
-            data.samples = &m_waveform[m_currentSample];
+        if ( keyDown ){
+            data.samples = &m_waveform[0];
+        }
         else{
-            data.samples = &m_silence[m_currentSample];
+            data.samples = &m_silence[0];
         }
 
-        // have we reached the end of the sound?
-        if (m_currentSample + samplesToStream <= m_waveform.size())
-        {
-            // end not reached: stream the samples and continue
-            data.sampleCount = samplesToStream;
-            m_currentSample += samplesToStream;
-            return true;
-        }
-        else
-        {
-            // end of stream reached: stream the remaining samples and stop playback
-            data.sampleCount = m_waveform.size() - m_currentSample;
-
-            silenced = true;
-            m_currentSample = 0;
-
-            return true;
-        }
+        // set the sampleCount to the wavelength
+        data.sampleCount = generated;
     }
 
     //Internally used .... don't really have to care about it
     virtual void onSeek(sf::Time timeOffset){
-        m_currentSample = static_cast<std::size_t>(timeOffset.asSeconds() * getSampleRate() * getChannelCount());
+        //m_currentSample = static_cast<std::size_t>(timeOffset.asSeconds() * getSampleRate() * getChannelCount());
     }
 };
 
 //Stores the key order on the QWERTY keyboard ( so notes are in order )
 char keyOrder[] = "qwertyuiopasdfghjklzxcvbnm";
 
-
 /** Transforms the keycode to a note using the keyOrder */
 int getLn( int code ){
     for ( int i = 0; i < sizeof(keyOrder); i++ )
         if ( code+'a' == keyOrder[i] )
             return i;
-    return 55; // Default return value ( don't ask why this )
+    return 0; // Default return value
 }
 
 /// Ratio used for generating note frequencies ( google this one up )
@@ -125,11 +116,12 @@ int main()
 
     //This is just to draw the window and test if it is working
     sf::RenderWindow window(sf::VideoMode(200, 200), "Custom Real Time Synth!");
+    window.setKeyRepeatEnabled(false);
     window.setFramerateLimit(60);
     sf::CircleShape shape(100.f);
     shape.setFillColor(sf::Color::Green);
 
-    customMake( 55.f ); // initialize the buffer for that frequency
+    customMake( 440.f ); // initialize the buffer for that frequency
 
     // initialize and play our custom stream
     SynthStream stream;
@@ -146,12 +138,21 @@ int main()
             if (event.type == sf::Event::Closed)
                 window.close();
             if (event.type == sf::Event::KeyPressed){
-                //This prints the key code of the pressed button and the note number ( from 0 = A3 )
-                std::cout << "Input " <<  event.key.code << " " << getLn(event.key.code) << std::endl;
-                customMake( 440 * pow ( RATIO, getLn( event.key.code ) ) ); // compute the note frequency
-                silenced = false; // make sure the SynthStream outputs sounds
-                m_currentSample = 0; // seek the stream to the first element of m_waveform
+                currentKey = event.key.code;
+                keyDown = true;
             }
+            if (event.type == sf::Event::KeyReleased){
+                if ( event.key.code == currentKey )
+                    keyDown = false;
+            }
+        }
+
+        if ( keyDown ){
+                if ( lastKey != currentKey ){
+                    std::cout << "Input " <<  currentKey << " " << getLn(currentKey) << std::endl;
+                    customMake( 440 * pow ( RATIO, getLn( currentKey ) ) ); // compute the note frequency
+                    lastKey = currentKey;
+                }
         }
 
         //General update stuff
