@@ -10,8 +10,8 @@ A real-time synthesizer that takes input from an arduino hooked up to metalic ob
   * usb cable
   * wires
   * resistors
-  * metalic objects ( triggers )
-  * tin foil ( -> metalic glove )
+  * metalic objects ( triggers ) - we use candles
+  * glove ( on which to attach some of the wires )
   * LEDs for debugging
   * speaker
 
@@ -35,7 +35,7 @@ The arduino is programmed to poll input from digital pins, encode information an
   - [ ] Triangle Wave
   - [ ] Sawtooth Wave
 - [ ] Arduino keyboard
-  - [ ] Metalic glove
+  - [ ] Wired glove
   - [ ] Triggers
   - [ ] Arduino Code
 
