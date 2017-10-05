@@ -1,5 +1,46 @@
-# CRLS
-Custom Real-Time Synthesizer
+# Custom Real-Time Synthesizer
+A real-time synthesizer that takes input from an arduino hooked up to metalic objects. The circuit is closed with a metalic glove that touches the triggers ( metalic objects ). A laptop / raspberry pi processes the input and outputs a square/sine/triangle/sawtooth wave to a speaker.
 
-## Dependencies
-[SFML](https://www.sfml-dev.org/)
+## Requirements & Implementation
+### Physical requirements
+- For the synth program
+  * laptop / raspberry pi
+- For the arduino keyboard
+  * arduino board
+  * usb cable
+  * wires
+  * resistors
+  * metalic objects ( triggers )
+  * tin foil ( -> metalic glove )
+  * LEDs for debugging
+  * speaker
+
+### Software requirements
+- For the synth program
+  * [SFML](https://www.sfml-dev.org/) installed
+  * A C++ compiler
+  * A text editor
+- For the arduino keyboard
+  * Arduino IDE
+
+### Implementation
+A main graphical window ( [sf::Window](https://www.sfml-dev.org/documentation/2.4.2/classsf_1_1Window.php) ) takes input from the arduino ( using a serial connection ), generates a waveform sample array ( [sf::SoundStream](https://www.sfml-dev.org/documentation/2.0/classsf_1_1SoundStream.php) ) and outputs it to the speaker.
+The arduino is programmed to poll input from digital pins, encode information and send it via the serial connection to the raspberry pi / laptop.
+
+## Todo List
+- [ ] C++ ( w/ SFML ) synth
+  - [x] Custom Sound Stream
+  - [ ] Square Wave
+  - [x] Sine Wave
+  - [ ] Triangle Wave
+  - [ ] Sawtooth Wave
+- [ ] Arduino keyboard
+  - [ ] Metalic glove
+  - [ ] Triggers
+  - [ ] Arduino Code
+
+- [ ] Article for it @ www.gdrh.ro
+- [ ] Demo video
+- [ ] Pictures
+- [ ] Project Schematic
+- [ ] Function documentation / Code comments
