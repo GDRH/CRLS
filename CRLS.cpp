@@ -22,6 +22,10 @@
 //Debug console output :
 #include <iostream>
 
+//Arduino Windows Serial Interface Library ( from ArduinoPlayground )
+//https://playground.arduino.cc/Interfacing/CPPWindows
+#include "SerialClass.h"
+
 //Stores the waveform to be outputed on the audio stream
 std::vector<sf::Int16> m_waveform;
 
@@ -85,6 +89,7 @@ private:
 
         // set the sampleCount to the wavelength
         data.sampleCount = generated;
+        return true;
     }
 
     //Internally used .... don't really have to care about it
@@ -98,7 +103,7 @@ char keyOrder[] = "qwertyuiopasdfghjklzxcvbnm";
 
 /** Transforms the keycode to a note using the keyOrder */
 int getLn( int code ){
-    for ( int i = 0; i < sizeof(keyOrder); i++ )
+    for ( unsigned int i = 0; i < sizeof(keyOrder); i++ )
         if ( code+'a' == keyOrder[i] )
             return i;
     return 0; // Default return value
@@ -130,6 +135,13 @@ int main()
 
     srand(time(NULL));
 
+    Serial* SP = new Serial("\\\\.\\COM8");    // adjust as needed
+	if (SP->IsConnected())
+		std::cout << "Arduino connected" << std::endl;
+	char incomingData[256] = "";
+	int dataLength = 255;
+	int readResult = 0;
+
     while (window.isOpen())
     {
         sf::Event event;
@@ -147,7 +159,19 @@ int main()
             }
         }
 
-        if ( keyDown ){
+        if ( SP->IsConnected() ){
+            readResult = SP->ReadData(incomingData,dataLength);
+            // printf("Bytes read: (0 means no data available) %i\n",readResult);
+            //incomingData[readResult] = 0;
+            if ( readResult > 0 ){
+                keyDown = 1 & ( incomingData[readResult-1] >> 7 );
+                currentKey = 0b01111111 & incomingData[readResult-1];
+                if ( lastKey != currentKey ){
+                    customMake( 440 * pow ( RATIO, currentKey ) ); // compute the note frequency
+                    lastKey = currentKey;
+                }
+            }
+        }else if ( keyDown ){
                 if ( lastKey != currentKey ){
                     std::cout << "Input " <<  currentKey << " " << getLn(currentKey) << std::endl;
                     customMake( 440 * pow ( RATIO, getLn( currentKey ) ) ); // compute the note frequency

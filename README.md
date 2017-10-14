@@ -30,7 +30,7 @@ The arduino is programmed to poll input from digital pins, encode information an
 ## Todo List
 - [ ] C++ ( w/ SFML ) synth
   - [x] Custom Sound Stream
-  - [ ] Arduino Serial Input Interface
+  - [x] Arduino Serial Input Interface
   - [ ] Square Wave
   - [x] Sine Wave
   - [ ] Triangle Wave
