@@ -15,6 +15,11 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+//This defines the Pi constant
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
+
 //These two are used for the srand() and rand() functions :
 #include <time.h>
 #include <stdlib.h>

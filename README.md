@@ -10,7 +10,7 @@ A real-time synthesizer that takes input from an arduino hooked up to metalic ob
   * usb cable
   * wires
   * resistors
-  * metalic objects ( triggers ) - we use candles
+  * metalic objects ( triggers ) - we used candles
   * glove ( on which to attach some of the wires )
   * LEDs for debugging
   * speaker
@@ -28,20 +28,19 @@ A main graphical window ( [sf::Window](https://www.sfml-dev.org/documentation/2.
 The arduino is programmed to poll input from digital pins, encode information and send it via the serial connection to the raspberry pi / laptop.
 
 ## Todo List
-- [ ] C++ ( w/ SFML ) synth
+- [x] C++ ( w/ SFML ) synth
   - [x] Custom Sound Stream
   - [x] Arduino Serial Input Interface
-  - [ ] Square Wave
   - [x] Sine Wave
-  - [ ] Triangle Wave
-  - [ ] Sawtooth Wave
-- [ ] Arduino keyboard
-  - [ ] Wired glove
-  - [ ] Triggers
+- [x] Arduino keyboard
+  - [x] Wired glove
+  - [x] Triggers
   - [x] Arduino Code
+  - [x] Box that holds everything together
+  - [ ] Extra details
 
 - [ ] Article for it @ www.gdrh.ro
 - [ ] Demo video
-- [ ] Pictures
+- [x] Pictures
 - [ ] Project Schematic
 - [ ] Function documentation / Code comments

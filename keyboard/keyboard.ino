@@ -1,6 +1,6 @@
-#define keyNumber 4
-byte keyStatus[4];
-byte keyMapping[] = { 7, 8, 9, 10 };
+#define keyNumber 8
+byte keyStatus[8];
+byte keyMapping[] = { 6, 7, 8, 9, 10, 11, 12, 13 };
 byte currentKey, currentStatus;
 
 void setup() {
